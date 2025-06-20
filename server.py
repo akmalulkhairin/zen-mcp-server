@@ -20,6 +20,7 @@ as defined by the MCP protocol.
 
 import argparse
 import asyncio
+import argparse
 import logging
 import os
 import sys
@@ -1281,11 +1282,16 @@ async def main():
     """
     # Parse command line arguments for UV/UVX support
     args = parse_args()
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> e799493 (feat: add UV/UVX support with config file approach)
     # Load and apply configuration from JSON file if provided
     if args.config:
         config = load_config_file(args.config)
         apply_config(config)
+<<<<<<< HEAD
 
     # Load additional .env file if specified
     if args.env_file:
@@ -1294,6 +1300,15 @@ async def main():
         load_dotenv(dotenv_path=args.env_file)
         logger.info(f"Loaded additional environment from {args.env_file}")
 
+=======
+    
+    # Load additional .env file if specified
+    if args.env_file:
+        from dotenv import load_dotenv
+        load_dotenv(dotenv_path=args.env_file)
+        logger.info(f"Loaded additional environment from {args.env_file}")
+    
+>>>>>>> e799493 (feat: add UV/UVX support with config file approach)
     # Validate and configure providers based on available API keys
     configure_providers()
 
