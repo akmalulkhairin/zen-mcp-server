@@ -80,9 +80,9 @@ jobs:
         # Test imports that should work after UV packaging
         try:
             from zen_mcp_server import main_entry
-            print('✓ Entry point import successful')
+            print('[OK] Entry point import successful')
         except ImportError as e:
-            print(f'✗ Entry point import failed: {e}')
+            print(f'[ERROR] Entry point import failed: {e}')
             sys.exit(1)
         "
 
@@ -109,12 +109,12 @@ jobs:
         try:
             loaded = load_config_file(config_path)
             assert loaded == config, 'Config loading failed'
-            print('✓ Config file loading works')
+            print('[OK] Config file loading works')
             
             # Test config application
             apply_config(loaded)
             assert os.getenv('GEMINI_API_KEY') == 'test-key', 'Config application failed'
-            print('✓ Config application works')
+            print('[OK] Config application works')
         finally:
             os.unlink(config_path)
         "
@@ -134,7 +134,7 @@ jobs:
           if [ -f "$file" ]; then
             echo "Validating $file..."
             python -m json.tool "$file" > /dev/null
-            echo "✓ $file is valid JSON"
+            echo "[OK] $file is valid JSON"
           fi
         done
 
@@ -158,7 +158,7 @@ jobs:
             
             assert 'api_keys' in config, f'{example_file} missing api_keys section'
             assert 'settings' in config or example_file.endswith('minimal.json'), f'{example_file} missing settings section'
-            print(f'✓ {example_file} has correct structure')
+            print(f'[OK] {example_file} has correct structure')
         
         print('All example files validated successfully')
         "
