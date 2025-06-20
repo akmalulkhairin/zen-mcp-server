@@ -165,10 +165,10 @@ def parse_args():
 
 def load_config_file(config_path: str) -> dict:
     """Load configuration from JSON file.
-    
+
     Args:
         config_path: Path to the JSON configuration file
-        
+
     Returns:
         dict: Configuration dictionary, empty dict on any error
     """
@@ -196,12 +196,12 @@ def load_config_file(config_path: str) -> dict:
 
 def apply_config(config: dict):
     """Apply configuration settings to environment variables.
-    
+
     Configuration precedence (highest to lowest):
     1. Existing environment variables (never overridden)
     2. JSON configuration file values
     3. Default values from config.py
-    
+
     Args:
         config: Dictionary containing 'api_keys' and 'settings' sections
     """
@@ -214,14 +214,14 @@ def apply_config(config: dict):
         if not isinstance(key, str):
             logger.warning(f"Skipping invalid API key name: {key} (must be string)")
             continue
-            
+
         env_var = f"{key.upper()}_API_KEY"
-        
+
         # Skip None/empty values
         if not value:
             logger.debug(f"Skipping empty value for {env_var}")
             continue
-            
+
         # Only set if environment variable doesn't already exist (precedence rule)
         if not os.getenv(env_var):
             try:
@@ -238,14 +238,14 @@ def apply_config(config: dict):
         if not isinstance(key, str):
             logger.warning(f"Skipping invalid setting name: {key} (must be string)")
             continue
-            
+
         env_var = key.upper()
-        
+
         # Skip None values but allow empty strings and zero values
         if value is None:
             logger.debug(f"Skipping None value for {env_var}")
             continue
-            
+
         # Only set if environment variable doesn't already exist (precedence rule)
         if not os.getenv(env_var):
             try:

@@ -181,14 +181,8 @@ class TestUVConfig(unittest.TestCase):
         """Test error handling in apply_config function."""
         # Test with invalid key types
         config = {
-            "api_keys": {
-                123: "invalid-key-name",  # Invalid non-string key
-                "valid_key": "valid-value"
-            },
-            "settings": {
-                456: "invalid-setting-name",  # Invalid non-string key
-                "valid_setting": "valid-value"
-            }
+            "api_keys": {123: "invalid-key-name", "valid_key": "valid-value"},  # Invalid non-string key
+            "settings": {456: "invalid-setting-name", "valid_setting": "valid-value"},  # Invalid non-string key
         }
 
         # Clear any existing env vars
@@ -213,12 +207,8 @@ class TestUVConfig(unittest.TestCase):
         os.environ["TEST_PRECEDENCE_SETTING"] = "env-setting"
 
         config = {
-            "api_keys": {
-                "test_precedence": "config-value"
-            },
-            "settings": {
-                "test_precedence_setting": "config-setting"
-            }
+            "api_keys": {"test_precedence": "config-value"},
+            "settings": {"test_precedence_setting": "config-setting"},
         }
 
         apply_config(config)
