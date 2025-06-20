@@ -120,7 +120,7 @@ class TestUVConfig(unittest.TestCase):
             del os.environ["GEMINI_API_KEY"]
         if "OPENAI_API_KEY" in os.environ:
             del os.environ["OPENAI_API_KEY"]
-        
+
         config = {"api_keys": {"gemini": None, "openai": "valid-key"}}
 
         apply_config(config)
