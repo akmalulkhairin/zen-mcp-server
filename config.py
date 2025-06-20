@@ -7,13 +7,15 @@ constants used throughout the application.
 
 Configuration Precedence Order (highest to lowest priority):
 1. Environment variables (highest priority)
-2. JSON configuration files (loaded via --config flag)
-3. Default values in this module (lowest priority)
+2. Default .env file in project root (loaded at module import time)
+3. JSON configuration files (loaded via --config flag)
+4. Default values in this module (lowest priority)
 
 UV/UVX JSON Configuration Support:
 When using UV/UVX with --config flag, JSON configuration files are loaded and
-applied to environment variables before this module is initialized. Environment
-variables that are already set will NOT be overridden by config file values.
+applied after the default .env file has been processed. Environment variables
+that are already set (from system environment or .env file) will NOT be
+overridden by JSON config file values.
 Supported JSON configuration format:
 
 {

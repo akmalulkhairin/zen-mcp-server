@@ -199,8 +199,9 @@ def apply_config(config: dict):
 
     Configuration precedence (highest to lowest):
     1. Existing environment variables (never overridden)
-    2. JSON configuration file values
-    3. Default values from config.py
+    2. Default .env file values (loaded at module import)
+    3. JSON configuration file values (this function)
+    4. Default values from config.py
 
     Args:
         config: Dictionary containing 'api_keys' and 'settings' sections
