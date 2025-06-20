@@ -1,4 +1,5 @@
 """UV/UVX entry point for Zen MCP Server."""
+
 import asyncio
 import sys
 from pathlib import Path
@@ -9,6 +10,7 @@ def main_entry():
     try:
         # Import the server main function
         from server import main
+
         asyncio.run(main())
     except KeyboardInterrupt:
         # Handle graceful shutdown

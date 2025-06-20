@@ -18,8 +18,8 @@ The server runs on stdio (standard input/output) and communicates using JSON-RPC
 as defined by the MCP protocol.
 """
 
-import asyncio
 import argparse
+import asyncio
 import logging
 import os
 import sys
@@ -166,9 +166,9 @@ def parse_args():
 def load_config_file(config_path: str) -> dict:
     """Load configuration from JSON file."""
     import json
-    
+
     try:
-        with open(config_path, 'r') as f:
+        with open(config_path) as f:
             config = json.load(f)
         logger.info(f"Loaded configuration from {config_path}")
         return config
@@ -181,7 +181,7 @@ def apply_config(config: dict):
     """Apply configuration settings to environment variables."""
     if not config:
         return
-        
+
     # Apply API keys
     api_keys = config.get("api_keys", {})
     for key, value in api_keys.items():
@@ -189,7 +189,7 @@ def apply_config(config: dict):
         if value and not os.getenv(env_var):
             os.environ[env_var] = value
             logger.info(f"Set {env_var} from config file")
-    
+
     # Apply settings
     settings = config.get("settings", {})
     for key, value in settings.items():
@@ -1222,18 +1222,19 @@ async def main():
     """
     # Parse command line arguments for UV/UVX support
     args = parse_args()
-    
+
     # Load and apply configuration from JSON file if provided
     if args.config:
         config = load_config_file(args.config)
         apply_config(config)
-    
+
     # Load additional .env file if specified
     if args.env_file:
         from dotenv import load_dotenv
+
         load_dotenv(dotenv_path=args.env_file)
         logger.info(f"Loaded additional environment from {args.env_file}")
-    
+
     # Validate and configure providers based on available API keys
     configure_providers()
 
