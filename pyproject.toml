@@ -1,6 +1,6 @@
 [tool.black]
 line-length = 120
-target-version = ['py39', 'py310', 'py311', 'py312', 'py313']
+target-version = ['py310', 'py311', 'py312', 'py313']
 include = '\.pyi?$'
 extend-exclude = '''
 /(
@@ -30,7 +30,7 @@ line_length = 120
 skip_glob = ["venv/*", ".venv/*", ".zen_venv/*"]
 
 [tool.ruff]
-target-version = "py39"
+target-version = "py310"
 line-length = 120
 
 [tool.ruff.lint]
@@ -72,13 +72,12 @@ classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
     "mcp>=1.0.0",
     "google-genai>=1.19.0",
@@ -94,6 +93,11 @@ Issues = "https://github.com/BeehiveInnovations/zen-mcp-server/issues"
 
 [project.scripts]
 zen_mcp_server = "zen_mcp_server:main_entry"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.1",
+]
 
 [tool.setuptools]
 packages = ["zen_mcp_server", "tools", "providers", "utils", "systemprompts"]

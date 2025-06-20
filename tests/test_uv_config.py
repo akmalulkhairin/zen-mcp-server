@@ -115,12 +115,19 @@ class TestUVConfig(unittest.TestCase):
 
     def test_apply_config_none_values(self):
         """Test applying configuration with None values."""
+        # Clear both keys to test config file setting them
+        if "GEMINI_API_KEY" in os.environ:
+            del os.environ["GEMINI_API_KEY"]
+        if "OPENAI_API_KEY" in os.environ:
+            del os.environ["OPENAI_API_KEY"]
+        
         config = {"api_keys": {"gemini": None, "openai": "valid-key"}}
 
         apply_config(config)
 
-        # None values should be ignored
+        # None values should be ignored (should not add GEMINI_API_KEY)
         self.assertNotIn("GEMINI_API_KEY", os.environ)
+        # Valid values should be set when no existing env var
         self.assertEqual(os.environ.get("OPENAI_API_KEY"), "valid-key")
 
     def test_full_config_integration(self):
