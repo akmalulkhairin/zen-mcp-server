@@ -19,6 +19,7 @@ as defined by the MCP protocol.
 """
 
 import asyncio
+import argparse
 import logging
 import os
 import sys
@@ -152,6 +153,51 @@ except Exception as e:
     print(f"Warning: Could not set up file logging: {e}", file=sys.stderr)
 
 logger = logging.getLogger(__name__)
+
+
+def parse_args():
+    """Parse command line arguments for UV/UVX support."""
+    parser = argparse.ArgumentParser(description="Zen MCP Server")
+    parser.add_argument("--config", help="Path to JSON configuration file")
+    parser.add_argument("--env-file", help="Path to .env file")
+    return parser.parse_args()
+
+
+def load_config_file(config_path: str) -> dict:
+    """Load configuration from JSON file."""
+    import json
+    
+    try:
+        with open(config_path, 'r') as f:
+            config = json.load(f)
+        logger.info(f"Loaded configuration from {config_path}")
+        return config
+    except Exception as e:
+        logger.error(f"Failed to load config file {config_path}: {e}")
+        return {}
+
+
+def apply_config(config: dict):
+    """Apply configuration settings to environment variables."""
+    if not config:
+        return
+        
+    # Apply API keys
+    api_keys = config.get("api_keys", {})
+    for key, value in api_keys.items():
+        env_var = f"{key.upper()}_API_KEY"
+        if value and not os.getenv(env_var):
+            os.environ[env_var] = value
+            logger.info(f"Set {env_var} from config file")
+    
+    # Apply settings
+    settings = config.get("settings", {})
+    for key, value in settings.items():
+        env_var = key.upper()
+        if value is not None and not os.getenv(env_var):
+            os.environ[env_var] = str(value)
+            logger.info(f"Set {env_var} from config file")
+
 
 # Create the MCP server instance with a unique name identifier
 # This name is used by MCP clients to identify and connect to this specific server
@@ -1174,6 +1220,20 @@ async def main():
     The server communicates via standard input/output streams using the
     MCP protocol's JSON-RPC message format.
     """
+    # Parse command line arguments for UV/UVX support
+    args = parse_args()
+    
+    # Load and apply configuration from JSON file if provided
+    if args.config:
+        config = load_config_file(args.config)
+        apply_config(config)
+    
+    # Load additional .env file if specified
+    if args.env_file:
+        from dotenv import load_dotenv
+        load_dotenv(dotenv_path=args.env_file)
+        logger.info(f"Loaded additional environment from {args.env_file}")
+    
     # Validate and configure providers based on available API keys
     configure_providers()
 

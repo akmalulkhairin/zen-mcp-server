@@ -6,6 +6,27 @@ It defines model configurations, token limits, temperature defaults, and other
 constants used throughout the application.
 
 Configuration values can be overridden by environment variables where appropriate.
+
+UV/UVX JSON Configuration Support:
+When using UV/UVX with --config flag, JSON configuration files are loaded and
+applied to environment variables before this module is initialized. Supported
+JSON configuration format:
+
+{
+  "api_keys": {
+    "gemini": "your-gemini-api-key",
+    "openai": "your-openai-api-key",
+    "xai": "your-xai-api-key",
+    "openrouter": "your-openrouter-api-key"
+  },
+  "settings": {
+    "default_model": "auto",
+    "default_thinking_mode_thinkdeep": "high",
+    "log_level": "DEBUG"
+  }
+}
+
+The JSON settings map to environment variables (uppercase with underscores).
 """
 
 import os

@@ -1,0 +1,9 @@
+{
+  "api_keys": {
+    "openrouter": "your-openrouter-api-key-here"
+  },
+  "settings": {
+    "default_model": "auto",
+    "log_level": "INFO"
+  }
+}

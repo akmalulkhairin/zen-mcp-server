@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "zen": {
+      "command": "uvx",
+      "args": [
+        "--from", 
+        "/path/to/zen-mcp-server", 
+        "zen_mcp_server", 
+        "--config", 
+        "/path/to/zen-mcp-server/zen-config.json"
+      ]
+    }
+  }
+}

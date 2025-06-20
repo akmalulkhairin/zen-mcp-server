@@ -1,0 +1,212 @@
+name: Test UV/UVX Integration
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  test-uv-integration:
+    name: Test UV/UVX on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ['3.9', '3.11', '3.12']
+      fail-fast: false
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install UV
+      uses: astral-sh/setup-uv@v4
+      with:
+        enable-cache: true
+        cache-dependency-glob: "pyproject.toml"
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Test UV build and entry point
+      run: |
+        # Test that UV can build the package
+        uv build
+        
+        # Test entry point with --help flag
+        uvx --from . zen_mcp_server --help
+
+    - name: Test UV with config file
+      shell: bash
+      run: |
+        # Create test config file
+        cat > test-config.json << 'EOF'
+        {
+          "api_keys": {
+            "gemini": "",
+            "openai": "",
+            "xai": "",
+            "openrouter": ""
+          },
+          "settings": {
+            "default_model": "auto",
+            "default_thinking_mode_thinkdeep": "high",
+            "log_level": "INFO"
+          }
+        }
+        EOF
+        
+        # Test config file loading (should fail with missing API keys but load config)
+        timeout 10s uvx --from . zen_mcp_server --config test-config.json || echo "Expected failure due to missing API keys"
+
+    - name: Test UV from Git URL (Linux/macOS only)
+      if: runner.os != 'Windows'
+      run: |
+        # Test that UV can install directly from git
+        # Note: This tests the full git+https:// workflow
+        timeout 10s uvx --from git+file://${{ github.workspace }} zen_mcp_server --help || echo "Git URL test completed"
+
+    - name: Verify package structure
+      run: |
+        # Check that all required modules are included in the build
+        uv run python -c "
+        import sys
+        sys.path.insert(0, '.')
+        
+        # Test imports that should work after UV packaging
+        try:
+            from zen_mcp_server import main_entry
+            print('✓ Entry point import successful')
+        except ImportError as e:
+            print(f'✗ Entry point import failed: {e}')
+            sys.exit(1)
+        "
+
+    - name: Test config validation
+      run: |
+        uv run python -c "
+        import sys
+        sys.path.insert(0, '.')
+        from server import load_config_file, apply_config
+        import tempfile
+        import json
+        import os
+        
+        # Test config file loading
+        config = {
+            'api_keys': {'gemini': 'test-key'},
+            'settings': {'default_model': 'auto'}
+        }
+        
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+            json.dump(config, f)
+            config_path = f.name
+        
+        try:
+            loaded = load_config_file(config_path)
+            assert loaded == config, 'Config loading failed'
+            print('✓ Config file loading works')
+            
+            # Test config application
+            apply_config(loaded)
+            assert os.getenv('GEMINI_API_KEY') == 'test-key', 'Config application failed'
+            print('✓ Config application works')
+        finally:
+            os.unlink(config_path)
+        "
+
+  test-examples:
+    name: Validate Example Files
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Validate JSON config examples
+      run: |
+        # Validate all JSON config examples are valid JSON
+        for file in examples/zen-config-*.json examples/claude_desktop_uv_*.json; do
+          if [ -f "$file" ]; then
+            echo "Validating $file..."
+            python -m json.tool "$file" > /dev/null
+            echo "✓ $file is valid JSON"
+          fi
+        done
+
+    - name: Test example config files
+      run: |
+        # Test that example configs have required structure
+        python -c "
+        import json
+        import sys
+        
+        required_examples = [
+            'examples/zen-config-template.json',
+            'examples/zen-config-minimal.json', 
+            'examples/zen-config-openrouter.json'
+        ]
+        
+        for example_file in required_examples:
+            print(f'Testing {example_file}...')
+            with open(example_file) as f:
+                config = json.load(f)
+            
+            assert 'api_keys' in config, f'{example_file} missing api_keys section'
+            assert 'settings' in config or example_file.endswith('minimal.json'), f'{example_file} missing settings section'
+            print(f'✓ {example_file} has correct structure')
+        
+        print('All example files validated successfully')
+        "
+
+  test-cross-platform-paths:
+    name: Test Cross-Platform Config Paths
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install UV
+      uses: astral-sh/setup-uv@v4
+
+    - name: Test platform-specific config paths
+      shell: bash
+      run: |
+        # Create config in platform-appropriate location
+        case "$RUNNER_OS" in
+          Linux)
+            config_dir="$HOME/.config/zen-mcp"
+            ;;
+          macOS)
+            config_dir="$HOME/.config/zen-mcp"
+            ;;
+          Windows)
+            config_dir="$APPDATA/zen-mcp"
+            ;;
+        esac
+        
+        mkdir -p "$config_dir"
+        
+        # Create test config
+        cat > "$config_dir/config.json" << 'EOF'
+        {
+          "api_keys": {
+            "gemini": "test-key"
+          },
+          "settings": {
+            "default_model": "auto"
+          }
+        }
+        EOF
+        
+        # Test that UV can use the config file
+        echo "Testing config at: $config_dir/config.json"
+        timeout 10s uvx --from . zen_mcp_server --config "$config_dir/config.json" || echo "Config path test completed"

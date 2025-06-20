@@ -58,3 +58,46 @@ ignore = [
 [build-system]
 requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "zen-mcp-server"
+dynamic = ["version"]
+description = "A comprehensive MCP server with AI provider integrations and powerful tools"
+readme = "README.md"
+license = "MIT"
+authors = [
+    {name = "Zen MCP Server Contributors"}
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+requires-python = ">=3.9"
+dependencies = [
+    "mcp>=1.0.0",
+    "google-genai>=1.19.0",
+    "openai>=1.55.2",
+    "pydantic>=2.0.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/BeehiveInnovations/zen-mcp-server"
+Repository = "https://github.com/BeehiveInnovations/zen-mcp-server"
+Issues = "https://github.com/BeehiveInnovations/zen-mcp-server/issues"
+
+[project.scripts]
+zen_mcp_server = "zen_mcp_server:main_entry"
+
+[tool.setuptools]
+packages = ["zen_mcp_server", "tools", "providers", "utils", "systemprompts"]
+py-modules = ["server", "config"]
+
+[tool.setuptools_scm]
+write_to = "zen_mcp_server/_version.py"

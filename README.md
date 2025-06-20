@@ -199,6 +199,79 @@ nano .env
 **Next**: Now run `claude` from your project folder using the terminal for it to connect to the newly added mcp server. 
 If you were already running a `claude` code session, please exit and start a new session.
 
+## Alternative Setup: UV/UVX (Modern Python Packaging)
+
+For users who prefer modern Python tooling, Zen MCP Server now supports UV/UVX for simplified installation and dependency management.
+
+### Prerequisites for UV/UVX
+- [UV installed](https://docs.astral.sh/uv/getting-started/installation/) on your system
+- Python 3.9+ (UV will manage this automatically)
+
+### UV/UVX Setup Options
+
+#### Option 1: Direct from Repository (Recommended)
+```bash
+# Run directly from repository without cloning
+uvx --from git+https://github.com/BeehiveInnovations/zen-mcp-server zen_mcp_server --config ~/zen-config.json
+```
+
+#### Option 2: From Local Repository
+```bash
+# If you have already cloned the repository
+git clone https://github.com/BeehiveInnovations/zen-mcp-server.git
+cd zen-mcp-server
+uvx --from . zen_mcp_server --config zen-config.json
+```
+
+### UV/UVX Configuration
+
+Create a JSON configuration file for your API keys and settings:
+
+```json
+{
+  "api_keys": {
+    "gemini": "your-gemini-api-key-here",
+    "openai": "your-openai-api-key-here", 
+    "xai": "your-xai-api-key-here",
+    "openrouter": "your-openrouter-api-key-here"
+  },
+  "settings": {
+    "default_model": "auto",
+    "default_thinking_mode_thinkdeep": "high",
+    "log_level": "INFO"
+  }
+}
+```
+
+Save this as `zen-config.json` (or any filename you prefer).
+
+### Claude Desktop Configuration for UV/UVX
+
+Update your Claude Desktop configuration file:
+
+**macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+**Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+
+```json
+{
+  "mcpServers": {
+    "zen": {
+      "command": "uvx",
+      "args": ["--from", "git+https://github.com/BeehiveInnovations/zen-mcp-server", "zen_mcp_server", "--config", "/path/to/your/zen-config.json"]
+    }
+  }
+}
+```
+
+**Benefits of UV/UVX approach:**
+- ✅ **No cloning required** - Run directly from GitHub
+- ✅ **Automatic dependency management** - UV handles Python environment
+- ✅ **Cross-platform** - Same commands work everywhere
+- ✅ **Cleaner configuration** - JSON config files instead of .env
+- ✅ **Always up-to-date** - Pulls latest version automatically
+
+**Backward Compatibility:** The traditional `./run-server.sh` method continues to work alongside UV/UVX support.
+
 #### If Setting up for Claude Desktop
 
 **Need the exact configuration?** Run `./run-server.sh -c` to display the platform-specific setup instructions with correct paths.
