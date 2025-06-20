@@ -27,7 +27,7 @@ import time
 from datetime import datetime
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from dotenv import load_dotenv
 
@@ -682,7 +682,7 @@ async def handle_call_tool(name: str, arguments: dict[str, Any]) -> list[TextCon
         return [TextContent(type="text", text=f"Unknown tool: {name}")]
 
 
-def parse_model_option(model_string: str) -> tuple[str, Optional[str]]:
+def parse_model_option(model_string: str) -> tuple[str, str | None]:
     """
     Parse model:option format into model name and option.
 

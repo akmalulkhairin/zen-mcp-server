@@ -4,7 +4,6 @@ import logging
 import os
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Optional
 
 from utils.file_utils import read_json_file
 
@@ -31,7 +30,7 @@ class OpenRouterModelConfig:
     supports_images: bool = False  # Whether model can process images
     max_image_size_mb: float = 0.0  # Maximum total size for all images in MB
     supports_temperature: bool = True  # Whether model accepts temperature parameter in API calls
-    temperature_constraint: Optional[str] = (
+    temperature_constraint: str | None = (
         None  # Type of temperature constraint: "fixed", "range", "discrete", or None for default range
     )
     is_custom: bool = False  # True for models that should only be used with custom endpoints
@@ -66,7 +65,7 @@ class OpenRouterModelConfig:
 class OpenRouterModelRegistry:
     """Registry for managing OpenRouter model configurations and aliases."""
 
-    def __init__(self, config_path: Optional[str] = None):
+    def __init__(self, config_path: str | None = None):
         """Initialize the registry.
 
         Args:
@@ -211,7 +210,7 @@ class OpenRouterModelRegistry:
         self.alias_map = alias_map
         self.model_map = model_map
 
-    def resolve(self, name_or_alias: str) -> Optional[OpenRouterModelConfig]:
+    def resolve(self, name_or_alias: str) -> OpenRouterModelConfig | None:
         """Resolve a model name or alias to configuration.
 
         Args:
@@ -228,7 +227,7 @@ class OpenRouterModelRegistry:
 
         return None
 
-    def get_capabilities(self, name_or_alias: str) -> Optional[ModelCapabilities]:
+    def get_capabilities(self, name_or_alias: str) -> ModelCapabilities | None:
         """Get model capabilities for a name or alias.
 
         Args:

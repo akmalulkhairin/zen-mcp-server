@@ -1,7 +1,6 @@
 """X.AI (GROK) model provider implementation."""
 
 import logging
-from typing import Optional
 
 from .base import (
     ModelCapabilities,
@@ -101,9 +100,9 @@ class XAIModelProvider(OpenAICompatibleProvider):
         self,
         prompt: str,
         model_name: str,
-        system_prompt: Optional[str] = None,
+        system_prompt: str | None = None,
         temperature: float = 0.7,
-        max_output_tokens: Optional[int] = None,
+        max_output_tokens: int | None = None,
         **kwargs,
     ) -> ModelResponse:
         """Generate content using X.AI API with proper model name resolution."""

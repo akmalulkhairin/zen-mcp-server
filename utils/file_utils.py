@@ -41,7 +41,6 @@ import json
 import logging
 import os
 from pathlib import Path
-from typing import Optional
 
 from .file_types import BINARY_EXTENSIONS, CODE_EXTENSIONS, IMAGE_EXTENSIONS, TEXT_EXTENSIONS
 from .security_config import EXCLUDED_DIRS, is_dangerous_path
@@ -110,7 +109,7 @@ def is_mcp_directory(path: Path) -> bool:
         return False
 
 
-def get_user_home_directory() -> Optional[Path]:
+def get_user_home_directory() -> Path | None:
     """
     Get the user's home directory.
 
@@ -218,7 +217,7 @@ def detect_file_type(file_path: str) -> str:
         return "unknown"
 
 
-def should_add_line_numbers(file_path: str, include_line_numbers: Optional[bool] = None) -> bool:
+def should_add_line_numbers(file_path: str, include_line_numbers: bool | None = None) -> bool:
     """
     Determine if line numbers should be added to a file.
 
@@ -323,7 +322,7 @@ def resolve_and_validate_path(path_str: str) -> Path:
     return resolved_path
 
 
-def expand_paths(paths: list[str], extensions: Optional[set[str]] = None) -> list[str]:
+def expand_paths(paths: list[str], extensions: set[str] | None = None) -> list[str]:
     """
     Expand paths to individual files, handling both files and directories.
 
@@ -418,7 +417,7 @@ def expand_paths(paths: list[str], extensions: Optional[set[str]] = None) -> lis
 
 
 def read_file_content(
-    file_path: str, max_size: int = 1_000_000, *, include_line_numbers: Optional[bool] = None
+    file_path: str, max_size: int = 1_000_000, *, include_line_numbers: bool | None = None
 ) -> tuple[str, int]:
     """
     Read a single file and format it for inclusion in AI prompts.
@@ -510,8 +509,8 @@ def read_file_content(
 
 def read_files(
     file_paths: list[str],
-    code: Optional[str] = None,
-    max_tokens: Optional[int] = None,
+    code: str | None = None,
+    max_tokens: int | None = None,
     reserve_tokens: int = 50_000,
     *,
     include_line_numbers: bool = False,
@@ -672,7 +671,7 @@ def check_files_size_limit(files: list[str], max_tokens: int, threshold_percent:
     return within_limit, total_estimated_tokens, file_count
 
 
-def read_json_file(file_path: str) -> Optional[dict]:
+def read_json_file(file_path: str) -> dict | None:
     """
     Read and parse a JSON file with proper error handling.
 
@@ -766,7 +765,7 @@ def is_text_file(file_path: str) -> bool:
     return check_text_type(file_path)
 
 
-def read_file_safely(file_path: str, max_size: int = 10 * 1024 * 1024) -> Optional[str]:
+def read_file_safely(file_path: str, max_size: int = 10 * 1024 * 1024) -> str | None:
     """
     Read a file with size limits and encoding handling.
 
@@ -791,7 +790,7 @@ def read_file_safely(file_path: str, max_size: int = 10 * 1024 * 1024) -> Option
         return None
 
 
-def check_total_file_size(files: list[str], model_name: str) -> Optional[dict]:
+def check_total_file_size(files: list[str], model_name: str) -> dict | None:
     """
     Check if total file sizes would exceed token threshold before embedding.
 

@@ -2,7 +2,7 @@
 ThinkDeep tool - Extended reasoning and problem-solving
 """
 
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any
 
 from pydantic import Field
 
@@ -35,10 +35,10 @@ class ThinkDeepRequest(ToolRequest):
     """Request model for thinkdeep tool"""
 
     prompt: str = Field(..., description=THINKDEEP_FIELD_DESCRIPTIONS["prompt"])
-    problem_context: Optional[str] = Field(None, description=THINKDEEP_FIELD_DESCRIPTIONS["problem_context"])
-    focus_areas: Optional[list[str]] = Field(None, description=THINKDEEP_FIELD_DESCRIPTIONS["focus_areas"])
-    files: Optional[list[str]] = Field(None, description=THINKDEEP_FIELD_DESCRIPTIONS["files"])
-    images: Optional[list[str]] = Field(None, description=THINKDEEP_FIELD_DESCRIPTIONS["images"])
+    problem_context: str | None = Field(None, description=THINKDEEP_FIELD_DESCRIPTIONS["problem_context"])
+    focus_areas: list[str] | None = Field(None, description=THINKDEEP_FIELD_DESCRIPTIONS["focus_areas"])
+    files: list[str] | None = Field(None, description=THINKDEEP_FIELD_DESCRIPTIONS["files"])
+    images: list[str] | None = Field(None, description=THINKDEEP_FIELD_DESCRIPTIONS["images"])
 
 
 class ThinkDeepTool(BaseTool):
@@ -209,7 +209,7 @@ Please provide deep analysis that extends Claude's thinking with:
 
         return full_prompt
 
-    def format_response(self, response: str, request: ThinkDeepRequest, model_info: Optional[dict] = None) -> str:
+    def format_response(self, response: str, request: ThinkDeepRequest, model_info: dict | None = None) -> str:
         """Format the response with clear attribution and critical thinking prompt"""
         # Get the friendly model name
         model_name = "your fellow developer"

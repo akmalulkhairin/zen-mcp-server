@@ -4,7 +4,7 @@ Debug Issue tool - Root cause analysis and debugging assistance with systematic 
 
 import json
 import logging
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any
 
 from pydantic import Field, field_validator
 
@@ -121,24 +121,24 @@ class DebugInvestigationRequest(ToolRequest):
     relevant_methods: list[str] = Field(
         default_factory=list, description=DEBUG_INVESTIGATION_FIELD_DESCRIPTIONS["relevant_methods"]
     )
-    hypothesis: Optional[str] = Field(None, description=DEBUG_INVESTIGATION_FIELD_DESCRIPTIONS["hypothesis"])
-    confidence: Optional[str] = Field("low", description=DEBUG_INVESTIGATION_FIELD_DESCRIPTIONS["confidence"])
+    hypothesis: str | None = Field(None, description=DEBUG_INVESTIGATION_FIELD_DESCRIPTIONS["hypothesis"])
+    confidence: str | None = Field("low", description=DEBUG_INVESTIGATION_FIELD_DESCRIPTIONS["confidence"])
 
     # Optional backtracking field
-    backtrack_from_step: Optional[int] = Field(
+    backtrack_from_step: int | None = Field(
         None, description=DEBUG_INVESTIGATION_FIELD_DESCRIPTIONS["backtrack_from_step"]
     )
 
     # Optional continuation field
-    continuation_id: Optional[str] = Field(None, description=DEBUG_INVESTIGATION_FIELD_DESCRIPTIONS["continuation_id"])
+    continuation_id: str | None = Field(None, description=DEBUG_INVESTIGATION_FIELD_DESCRIPTIONS["continuation_id"])
 
     # Optional images for visual debugging
-    images: Optional[list[str]] = Field(default=None, description=DEBUG_INVESTIGATION_FIELD_DESCRIPTIONS["images"])
+    images: list[str] | None = Field(default=None, description=DEBUG_INVESTIGATION_FIELD_DESCRIPTIONS["images"])
 
     # Override inherited fields to exclude them from schema (except model which needs to be available)
-    temperature: Optional[float] = Field(default=None, exclude=True)
-    thinking_mode: Optional[str] = Field(default=None, exclude=True)
-    use_websearch: Optional[bool] = Field(default=None, exclude=True)
+    temperature: float | None = Field(default=None, exclude=True)
+    thinking_mode: str | None = Field(default=None, exclude=True)
+    use_websearch: bool | None = Field(default=None, exclude=True)
 
     @field_validator("files_checked", "relevant_files", "relevant_methods", mode="before")
     @classmethod
@@ -599,7 +599,7 @@ class DebugIssueTool(BaseTool):
 
         return "\n".join(summary_parts)
 
-    def _extract_error_context(self) -> Optional[str]:
+    def _extract_error_context(self) -> str | None:
         """Extract error context from investigation findings"""
         error_patterns = ["error", "exception", "stack trace", "traceback", "failure"]
         error_context_parts = []
@@ -616,12 +616,12 @@ class DebugIssueTool(BaseTool):
         investigation_summary: str,
         relevant_files: list[str],
         relevant_methods: list[str],
-        final_hypothesis: Optional[str],
-        error_context: Optional[str],
+        final_hypothesis: str | None,
+        error_context: str | None,
         images: list[str],
-        model_info: Optional[Any] = None,
-        arguments: Optional[dict] = None,
-        request: Optional[Any] = None,
+        model_info: Any | None = None,
+        arguments: dict | None = None,
+        request: Any | None = None,
     ) -> dict:
         """Call AI model for expert analysis of the investigation"""
         # Set up model context when we actually need it for expert analysis

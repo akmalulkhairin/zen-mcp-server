@@ -2,7 +2,6 @@
 
 import logging
 import os
-from typing import Optional
 
 from .base import (
     ModelCapabilities,
@@ -24,7 +23,7 @@ class CustomProvider(OpenAICompatibleProvider):
     FRIENDLY_NAME = "Custom API"
 
     # Model registry for managing configurations and aliases (shared with OpenRouter)
-    _registry: Optional[OpenRouterModelRegistry] = None
+    _registry: OpenRouterModelRegistry | None = None
 
     def __init__(self, api_key: str = "", base_url: str = "", **kwargs):
         """Initialize Custom provider for local/self-hosted models.
@@ -234,9 +233,9 @@ class CustomProvider(OpenAICompatibleProvider):
         self,
         prompt: str,
         model_name: str,
-        system_prompt: Optional[str] = None,
+        system_prompt: str | None = None,
         temperature: float = 0.7,
-        max_output_tokens: Optional[int] = None,
+        max_output_tokens: int | None = None,
         **kwargs,
     ) -> ModelResponse:
         """Generate content using the custom API.

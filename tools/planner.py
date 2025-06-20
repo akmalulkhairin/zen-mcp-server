@@ -58,7 +58,7 @@ and the tool will provide context from both previous completed planning sessions
 
 import json
 import logging
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any
 
 from pydantic import Field
 
@@ -99,7 +99,7 @@ class PlanStep:
     """Represents a single step in the planning process."""
 
     def __init__(
-        self, step_number: int, content: str, branch_id: Optional[str] = None, parent_step: Optional[int] = None
+        self, step_number: int, content: str, branch_id: str | None = None, parent_step: int | None = None
     ):
         self.step_number = step_number
         self.content = content
@@ -118,22 +118,22 @@ class PlannerRequest(ToolRequest):
     next_step_required: bool = Field(..., description=PLANNER_FIELD_DESCRIPTIONS["next_step_required"])
 
     # Optional revision/branching fields
-    is_step_revision: Optional[bool] = Field(False, description=PLANNER_FIELD_DESCRIPTIONS["is_step_revision"])
-    revises_step_number: Optional[int] = Field(None, description=PLANNER_FIELD_DESCRIPTIONS["revises_step_number"])
-    is_branch_point: Optional[bool] = Field(False, description=PLANNER_FIELD_DESCRIPTIONS["is_branch_point"])
-    branch_from_step: Optional[int] = Field(None, description=PLANNER_FIELD_DESCRIPTIONS["branch_from_step"])
-    branch_id: Optional[str] = Field(None, description=PLANNER_FIELD_DESCRIPTIONS["branch_id"])
-    more_steps_needed: Optional[bool] = Field(False, description=PLANNER_FIELD_DESCRIPTIONS["more_steps_needed"])
+    is_step_revision: bool | None = Field(False, description=PLANNER_FIELD_DESCRIPTIONS["is_step_revision"])
+    revises_step_number: int | None = Field(None, description=PLANNER_FIELD_DESCRIPTIONS["revises_step_number"])
+    is_branch_point: bool | None = Field(False, description=PLANNER_FIELD_DESCRIPTIONS["is_branch_point"])
+    branch_from_step: int | None = Field(None, description=PLANNER_FIELD_DESCRIPTIONS["branch_from_step"])
+    branch_id: str | None = Field(None, description=PLANNER_FIELD_DESCRIPTIONS["branch_id"])
+    more_steps_needed: bool | None = Field(False, description=PLANNER_FIELD_DESCRIPTIONS["more_steps_needed"])
 
     # Optional continuation field
-    continuation_id: Optional[str] = Field(None, description=PLANNER_FIELD_DESCRIPTIONS["continuation_id"])
+    continuation_id: str | None = Field(None, description=PLANNER_FIELD_DESCRIPTIONS["continuation_id"])
 
     # Override inherited fields to exclude them from schema
-    model: Optional[str] = Field(default=None, exclude=True)
-    temperature: Optional[float] = Field(default=None, exclude=True)
-    thinking_mode: Optional[str] = Field(default=None, exclude=True)
-    use_websearch: Optional[bool] = Field(default=None, exclude=True)
-    images: Optional[list] = Field(default=None, exclude=True)
+    model: str | None = Field(default=None, exclude=True)
+    temperature: float | None = Field(default=None, exclude=True)
+    thinking_mode: str | None = Field(default=None, exclude=True)
+    use_websearch: bool | None = Field(default=None, exclude=True)
+    images: list | None = Field(default=None, exclude=True)
 
 
 class PlannerTool(BaseTool):

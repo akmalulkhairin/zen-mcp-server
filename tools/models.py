@@ -3,7 +3,7 @@ Data models for tool responses and interactions
 """
 
 from enum import Enum
-from typing import Any, Literal, Optional
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
@@ -23,7 +23,7 @@ class ContinuationOffer(BaseModel):
         ..., description="Thread continuation ID for multi-turn conversations across different tools"
     )
     note: str = Field(..., description="Message explaining continuation opportunity to Claude")
-    suggested_tool_params: Optional[dict[str, Any]] = Field(
+    suggested_tool_params: dict[str, Any] | None = Field(
         None, description="Suggested parameters for continued tool usage"
     )
     remaining_turns: int = Field(..., description="Number of conversation turns remaining")
@@ -47,10 +47,10 @@ class ToolOutput(BaseModel):
         "continuation_available",
         "no_bug_found",
     ] = "success"
-    content: Optional[str] = Field(None, description="The main content/response from the tool")
+    content: str | None = Field(None, description="The main content/response from the tool")
     content_type: Literal["text", "markdown", "json"] = "text"
-    metadata: Optional[dict[str, Any]] = Field(default_factory=dict)
-    continuation_offer: Optional[ContinuationOffer] = Field(
+    metadata: dict[str, Any] | None = Field(default_factory=dict)
+    continuation_offer: ContinuationOffer | None = Field(
         None, description="Optional offer for Claude to continue conversation"
     )
 
@@ -60,10 +60,10 @@ class FilesNeededRequest(BaseModel):
 
     status: Literal["files_required_to_continue"] = "files_required_to_continue"
     mandatory_instructions: str = Field(..., description="Critical instructions for Claude regarding required context")
-    files_needed: Optional[list[str]] = Field(
+    files_needed: list[str] | None = Field(
         default_factory=list, description="Specific files that are needed for analysis"
     )
-    suggested_next_action: Optional[dict[str, Any]] = Field(
+    suggested_next_action: dict[str, Any] | None = Field(
         None,
         description="Suggested tool call with parameters after getting clarification",
     )
@@ -73,8 +73,8 @@ class FullCodereviewRequired(BaseModel):
     """Request for full code review when scope is too large for quick review"""
 
     status: Literal["full_codereview_required"] = "full_codereview_required"
-    important: Optional[str] = Field(None, description="Important message about escalation")
-    reason: Optional[str] = Field(None, description="Reason why full review is needed")
+    important: str | None = Field(None, description="Important message about escalation")
+    reason: str | None = Field(None, description="Reason why full review is needed")
 
 
 class FocusedReviewRequired(BaseModel):
@@ -119,7 +119,7 @@ class RefactorOpportunity(BaseModel):
     rationale: str = Field(..., description="Why this improves the code")
     code_to_replace: str = Field(..., description="Original code that should be changed")
     replacement_code_snippet: str = Field(..., description="Refactored version of the code")
-    new_code_snippets: Optional[list[dict]] = Field(
+    new_code_snippets: list[dict] | None = Field(
         default_factory=list, description="Additional code snippets to be added"
     )
 
@@ -169,7 +169,7 @@ class TraceEntryPoint(BaseModel):
     class_or_struct: str = Field(..., description="Class or module name")
     method: str = Field(..., description="Method or function name")
     signature: str = Field(..., description="Full method signature")
-    parameters: Optional[dict[str, Any]] = Field(default_factory=dict, description="Parameter values used in analysis")
+    parameters: dict[str, Any] | None = Field(default_factory=dict, description="Parameter values used in analysis")
 
 
 class TraceTarget(BaseModel):
@@ -187,7 +187,7 @@ class CallPathStep(BaseModel):
     from_info: dict[str, Any] = Field(..., description="Source location information", alias="from")
     to: dict[str, Any] = Field(..., description="Target location information")
     reason: str = Field(..., description="Reason for the call or dependency")
-    condition: Optional[str] = Field(None, description="Conditional logic if applicable")
+    condition: str | None = Field(None, description="Conditional logic if applicable")
     ambiguous: bool = Field(False, description="Whether this call is ambiguous")
 
 
@@ -265,24 +265,24 @@ class TraceComplete(BaseModel):
     trace_type: Literal["precision", "dependencies"] = Field(..., description="Type of trace performed")
 
     # Precision mode fields
-    entry_point: Optional[TraceEntryPoint] = Field(None, description="Entry point for precision trace")
-    call_path: Optional[list[CallPathStep]] = Field(default_factory=list, description="Call path for precision trace")
-    branching_points: Optional[list[BranchingPoint]] = Field(default_factory=list, description="Branching points")
-    side_effects: Optional[list[SideEffect]] = Field(default_factory=list, description="Side effects detected")
-    unresolved: Optional[list[UnresolvedDependency]] = Field(
+    entry_point: TraceEntryPoint | None = Field(None, description="Entry point for precision trace")
+    call_path: list[CallPathStep] | None = Field(default_factory=list, description="Call path for precision trace")
+    branching_points: list[BranchingPoint] | None = Field(default_factory=list, description="Branching points")
+    side_effects: list[SideEffect] | None = Field(default_factory=list, description="Side effects detected")
+    unresolved: list[UnresolvedDependency] | None = Field(
         default_factory=list, description="Unresolved dependencies"
     )
 
     # Dependencies mode fields
-    target: Optional[TraceTarget] = Field(None, description="Target for dependency analysis")
-    incoming_dependencies: Optional[list[IncomingDependency]] = Field(
+    target: TraceTarget | None = Field(None, description="Target for dependency analysis")
+    incoming_dependencies: list[IncomingDependency] | None = Field(
         default_factory=list, description="Incoming dependencies"
     )
-    outgoing_dependencies: Optional[list[OutgoingDependency]] = Field(
+    outgoing_dependencies: list[OutgoingDependency] | None = Field(
         default_factory=list, description="Outgoing dependencies"
     )
-    type_dependencies: Optional[list[TypeDependency]] = Field(default_factory=list, description="Type dependencies")
-    state_access: Optional[list[StateAccess]] = Field(default_factory=list, description="State access information")
+    type_dependencies: list[TypeDependency] | None = Field(default_factory=list, description="Type dependencies")
+    state_access: list[StateAccess] | None = Field(default_factory=list, description="State access information")
 
 
 class DiagnosticHypothesis(BaseModel):
@@ -304,7 +304,7 @@ class StructuredDebugResponse(BaseModel):
         default_factory=list,
         description="Immediate steps to take regardless of root cause",
     )
-    additional_context_needed: Optional[list[str]] = Field(
+    additional_context_needed: list[str] | None = Field(
         default_factory=list,
         description="Additional files or information that would help with analysis",
     )
@@ -335,7 +335,7 @@ class DebugAnalysisComplete(BaseModel):
     key_findings: list[str] = Field(..., description="Important discoveries made during analysis")
     immediate_actions: list[str] = Field(..., description="Steps to take regardless of which hypothesis is correct")
     recommended_tools: list[str] = Field(default_factory=list, description="Additional tools recommended for analysis")
-    prevention_strategy: Optional[str] = Field(
+    prevention_strategy: str | None = Field(
         None, description="Targeted measures to prevent this exact issue from recurring"
     )
     investigation_summary: str = Field(

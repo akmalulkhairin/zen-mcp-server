@@ -7,7 +7,7 @@ It shows which providers are configured and what models can be used.
 """
 
 import os
-from typing import Any, Optional
+from typing import Any
 
 from mcp.types import TextContent
 
@@ -53,7 +53,7 @@ class ListModelsTool(BaseTool):
         """Not used for this utility tool"""
         return ""
 
-    def format_response(self, response: str, request: ToolRequest, model_info: Optional[dict] = None) -> str:
+    def format_response(self, response: str, request: ToolRequest, model_info: dict | None = None) -> str:
         """Not used for this utility tool"""
         return response
 

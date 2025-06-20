@@ -6,7 +6,6 @@ import logging
 import os
 import time
 from abc import abstractmethod
-from typing import Optional
 from urllib.parse import urlparse
 
 from openai import OpenAI
@@ -59,7 +58,7 @@ class OpenAICompatibleProvider(ModelProvider):
                 "This may be insecure. Consider setting an API key for authentication."
             )
 
-    def _parse_allowed_models(self) -> Optional[set[str]]:
+    def _parse_allowed_models(self) -> set[str] | None:
         """Parse allowed models from environment variable.
 
         Returns:
@@ -269,7 +268,7 @@ class OpenAICompatibleProvider(ModelProvider):
         model_name: str,
         messages: list,
         temperature: float,
-        max_output_tokens: Optional[int] = None,
+        max_output_tokens: int | None = None,
         **kwargs,
     ) -> ModelResponse:
         """Generate content using the /v1/responses endpoint for o3-pro via OpenAI library."""
@@ -385,10 +384,10 @@ class OpenAICompatibleProvider(ModelProvider):
         self,
         prompt: str,
         model_name: str,
-        system_prompt: Optional[str] = None,
+        system_prompt: str | None = None,
         temperature: float = 0.7,
-        max_output_tokens: Optional[int] = None,
-        images: Optional[list[str]] = None,
+        max_output_tokens: int | None = None,
+        images: list[str] | None = None,
         **kwargs,
     ) -> ModelResponse:
         """Generate content using the OpenAI-compatible API.
@@ -787,7 +786,7 @@ class OpenAICompatibleProvider(ModelProvider):
 
         return any(indicator in error_str for indicator in retryable_indicators)
 
-    def _process_image(self, image_path: str) -> Optional[dict]:
+    def _process_image(self, image_path: str) -> dict | None:
         """Process an image for OpenAI-compatible API."""
         try:
             if image_path.startswith("data:image/"):

@@ -14,7 +14,7 @@ Key Features:
 - Structured output with specific remediation steps
 """
 
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import Field
 
@@ -59,10 +59,10 @@ class CodeReviewRequest(ToolRequest):
 
     files: list[str] = Field(..., description=CODEREVIEW_FIELD_DESCRIPTIONS["files"])
     prompt: str = Field(..., description=CODEREVIEW_FIELD_DESCRIPTIONS["prompt"])
-    images: Optional[list[str]] = Field(None, description=CODEREVIEW_FIELD_DESCRIPTIONS["images"])
+    images: list[str] | None = Field(None, description=CODEREVIEW_FIELD_DESCRIPTIONS["images"])
     review_type: str = Field("full", description=CODEREVIEW_FIELD_DESCRIPTIONS["review_type"])
-    focus_on: Optional[str] = Field(None, description=CODEREVIEW_FIELD_DESCRIPTIONS["focus_on"])
-    standards: Optional[str] = Field(None, description=CODEREVIEW_FIELD_DESCRIPTIONS["standards"])
+    focus_on: str | None = Field(None, description=CODEREVIEW_FIELD_DESCRIPTIONS["focus_on"])
+    standards: str | None = Field(None, description=CODEREVIEW_FIELD_DESCRIPTIONS["standards"])
     severity_filter: str = Field("all", description=CODEREVIEW_FIELD_DESCRIPTIONS["severity_filter"])
 
 
@@ -285,7 +285,7 @@ Please provide a code review aligned with the user's context and expectations, f
 
         return full_prompt
 
-    def format_response(self, response: str, request: CodeReviewRequest, model_info: Optional[dict] = None) -> str:
+    def format_response(self, response: str, request: CodeReviewRequest, model_info: dict | None = None) -> str:
         """
         Format the review response.
 

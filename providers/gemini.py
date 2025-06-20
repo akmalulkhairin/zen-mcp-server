@@ -4,7 +4,6 @@ import base64
 import logging
 import os
 import time
-from typing import Optional
 
 from google import genai
 from google.genai import types
@@ -102,11 +101,11 @@ class GeminiModelProvider(ModelProvider):
         self,
         prompt: str,
         model_name: str,
-        system_prompt: Optional[str] = None,
+        system_prompt: str | None = None,
         temperature: float = 0.7,
-        max_output_tokens: Optional[int] = None,
+        max_output_tokens: int | None = None,
         thinking_mode: str = "medium",
-        images: Optional[list[str]] = None,
+        images: list[str] | None = None,
         **kwargs,
     ) -> ModelResponse:
         """Generate content using Gemini model."""
@@ -445,7 +444,7 @@ class GeminiModelProvider(ModelProvider):
 
         return any(indicator in error_str for indicator in retryable_indicators)
 
-    def _process_image(self, image_path: str) -> Optional[dict]:
+    def _process_image(self, image_path: str) -> dict | None:
         """Process an image for Gemini API."""
         try:
             if image_path.startswith("data:image/"):

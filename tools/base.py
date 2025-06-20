@@ -17,7 +17,7 @@ import json
 import logging
 import os
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, Literal, Optional
+from typing import TYPE_CHECKING, Any, Literal
 
 from mcp.types import TextContent
 from pydantic import BaseModel, Field
@@ -53,20 +53,20 @@ class ToolRequest(BaseModel):
     these common fields.
     """
 
-    model: Optional[str] = Field(
+    model: str | None = Field(
         None,
         description="Model to use. See tool's input schema for available models and their capabilities.",
     )
-    temperature: Optional[float] = Field(None, description="Temperature for response (tool-specific defaults)")
+    temperature: float | None = Field(None, description="Temperature for response (tool-specific defaults)")
     # Thinking mode controls how much computational budget the model uses for reasoning
     # Higher values allow for more complex reasoning but increase latency and cost
-    thinking_mode: Optional[Literal["minimal", "low", "medium", "high", "max"]] = Field(
+    thinking_mode: Literal["minimal", "low", "medium", "high", "max"] | None = Field(
         None,
         description=(
             "Thinking depth: minimal (0.5% of model max), low (8%), medium (33%), high (67%), max (100% of model max)"
         ),
     )
-    use_websearch: Optional[bool] = Field(
+    use_websearch: bool | None = Field(
         True,
         description=(
             "Enable web search for documentation, best practices, and current information. "
@@ -77,7 +77,7 @@ class ToolRequest(BaseModel):
             "would enhance the analysis."
         ),
     )
-    continuation_id: Optional[str] = Field(
+    continuation_id: str | None = Field(
         None,
         description=(
             "Thread continuation ID for multi-turn conversations. When provided, the complete conversation "
@@ -86,7 +86,7 @@ class ToolRequest(BaseModel):
             "additional findings, or answers to follow-up questions. Can be used across different tools."
         ),
     )
-    images: Optional[list[str]] = Field(
+    images: list[str] | None = Field(
         None,
         description=(
             "Optional image(s) for visual context. Accepts absolute file paths (must be FULL absolute paths to real files / folders - DO NOT SHORTEN) or "
@@ -565,7 +565,7 @@ class BaseTool(ABC):
 
         return ToolModelCategory.BALANCED
 
-    def get_conversation_embedded_files(self, continuation_id: Optional[str]) -> list[str]:
+    def get_conversation_embedded_files(self, continuation_id: str | None) -> list[str]:
         """
         Get list of files already embedded in conversation history.
 
@@ -593,7 +593,7 @@ class BaseTool(ABC):
         logger.debug(f"[FILES] {self.name}: Found {len(embedded_files)} embedded files")
         return embedded_files
 
-    def filter_new_files(self, requested_files: list[str], continuation_id: Optional[str]) -> list[str]:
+    def filter_new_files(self, requested_files: list[str], continuation_id: str | None) -> list[str]:
         """
         Filter out files that are already embedded in conversation history.
 
@@ -694,12 +694,12 @@ class BaseTool(ABC):
     def _prepare_file_content_for_prompt(
         self,
         request_files: list[str],
-        continuation_id: Optional[str],
+        continuation_id: str | None,
         context_description: str = "New files",
-        max_tokens: Optional[int] = None,
+        max_tokens: int | None = None,
         reserve_tokens: int = 1_000,
-        remaining_budget: Optional[int] = None,
-        arguments: Optional[dict] = None,
+        remaining_budget: int | None = None,
+        arguments: dict | None = None,
     ) -> tuple[str, list[str]]:
         """
         Centralized file processing implementing dual prioritization strategy.
@@ -885,7 +885,7 @@ class BaseTool(ABC):
         )
         return result, actually_processed_files
 
-    def get_websearch_instruction(self, use_websearch: bool, tool_specific: Optional[str] = None) -> str:
+    def get_websearch_instruction(self, use_websearch: bool, tool_specific: str | None = None) -> str:
         """
         Generate standardized web search instruction based on the use_websearch parameter.
 
@@ -948,7 +948,7 @@ When recommending searches, be specific about what information you need and why 
         """
         pass
 
-    def validate_file_paths(self, request) -> Optional[str]:
+    def validate_file_paths(self, request) -> str | None:
         """
         Validate that all file paths in the request are absolute.
 
@@ -983,7 +983,7 @@ When recommending searches, be specific about what information you need and why 
 
         return None
 
-    def check_prompt_size(self, text: str) -> Optional[dict[str, Any]]:
+    def check_prompt_size(self, text: str) -> dict[str, Any] | None:
         """
         Check if USER INPUT text is too large for MCP transport boundary.
 
@@ -1040,8 +1040,8 @@ When recommending searches, be specific about what information you need and why 
         return None
 
     def _validate_image_limits(
-        self, images: Optional[list[str]], model_name: str, continuation_id: Optional[str] = None
-    ) -> Optional[dict]:
+        self, images: list[str] | None, model_name: str, continuation_id: str | None = None
+    ) -> dict | None:
         """
         Validate image size against model capabilities at MCP boundary.
 
@@ -1194,7 +1194,7 @@ When recommending searches, be specific about what information you need and why 
 
         return estimate_file_tokens(file_path)
 
-    def check_total_file_size(self, files: list[str], model_name: str) -> Optional[dict[str, Any]]:
+    def check_total_file_size(self, files: list[str], model_name: str) -> dict[str, Any] | None:
         """
         Check if total file sizes would exceed token threshold before embedding.
 
@@ -1217,7 +1217,7 @@ When recommending searches, be specific about what information you need and why 
 
         return check_file_size_utility(files, model_name)
 
-    def handle_prompt_file(self, files: Optional[list[str]]) -> tuple[Optional[str], Optional[list[str]]]:
+    def handle_prompt_file(self, files: list[str] | None) -> tuple[str | None, list[str] | None]:
         """
         Check for and handle prompt.txt in the files list.
 
@@ -1504,7 +1504,7 @@ When recommending searches, be specific about what information you need and why 
             )
             return [TextContent(type="text", text=error_output.model_dump_json())]
 
-    def _parse_response(self, raw_text: str, request, model_info: Optional[dict] = None) -> ToolOutput:
+    def _parse_response(self, raw_text: str, request, model_info: dict | None = None) -> ToolOutput:
         """
         Parse the raw response and check for clarification requests.
 
@@ -1638,7 +1638,7 @@ When recommending searches, be specific about what information you need and why 
             metadata=metadata,
         )
 
-    def _check_continuation_opportunity(self, request) -> Optional[dict]:
+    def _check_continuation_opportunity(self, request) -> dict | None:
         """
         Check if we should offer Claude a continuation opportunity.
 
@@ -1687,7 +1687,7 @@ When recommending searches, be specific about what information you need and why 
             return None
 
     def _create_continuation_offer_response(
-        self, content: str, continuation_data: dict, request, model_info: Optional[dict] = None
+        self, content: str, continuation_data: dict, request, model_info: dict | None = None
     ) -> ToolOutput:
         """
         Create a response offering Claude the opportunity to continue conversation.
@@ -1805,7 +1805,7 @@ When recommending searches, be specific about what information you need and why 
         """
         pass
 
-    def format_response(self, response: str, request, model_info: Optional[dict] = None) -> str:
+    def format_response(self, response: str, request, model_info: dict | None = None) -> str:
         """
         Format the model's response for display.
 

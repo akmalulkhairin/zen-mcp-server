@@ -4,7 +4,7 @@ Consensus tool for multi-model perspective gathering and validation
 
 import json
 import logging
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any
 
 from mcp.types import TextContent
 from pydantic import BaseModel, Field, field_validator
@@ -56,11 +56,11 @@ class ModelConfig(BaseModel):
     """Enhanced model configuration for consensus tool"""
 
     model: str = Field(..., description=CONSENSUS_FIELD_DESCRIPTIONS["model_config_model"])
-    stance: Optional[str] = Field(
+    stance: str | None = Field(
         default="neutral",
         description=CONSENSUS_FIELD_DESCRIPTIONS["model_config_stance"],
     )
-    stance_prompt: Optional[str] = Field(
+    stance_prompt: str | None = Field(
         default=None,
         description=CONSENSUS_FIELD_DESCRIPTIONS["model_config_stance_prompt"],
     )
@@ -71,15 +71,15 @@ class ConsensusRequest(ToolRequest):
 
     prompt: str = Field(..., description=CONSENSUS_FIELD_DESCRIPTIONS["prompt"])
     models: list[ModelConfig] = Field(..., description=CONSENSUS_FIELD_DESCRIPTIONS["models"])
-    files: Optional[list[str]] = Field(
+    files: list[str] | None = Field(
         default_factory=list,
         description=CONSENSUS_FIELD_DESCRIPTIONS["files"],
     )
-    images: Optional[list[str]] = Field(
+    images: list[str] | None = Field(
         default_factory=list,
         description=CONSENSUS_FIELD_DESCRIPTIONS["images"],
     )
-    focus_areas: Optional[list[str]] = Field(
+    focus_areas: list[str] | None = Field(
         default_factory=list,
         description=CONSENSUS_FIELD_DESCRIPTIONS["focus_areas"],
     )
@@ -272,7 +272,7 @@ class ConsensusTool(BaseTool):
 
         return parts
 
-    def _normalize_stance(self, stance: Optional[str]) -> str:
+    def _normalize_stance(self, stance: str | None) -> str:
         """Normalize stance to canonical form."""
         if not stance:
             return "neutral"
@@ -339,7 +339,7 @@ class ConsensusTool(BaseTool):
 
         return valid_configs, skipped_entries
 
-    def _get_stance_enhanced_prompt(self, stance: str, custom_stance_prompt: Optional[str] = None) -> str:
+    def _get_stance_enhanced_prompt(self, stance: str, custom_stance_prompt: str | None = None) -> str:
         """Get the system prompt with stance injection based on the stance."""
         base_prompt = self.get_system_prompt()
 

@@ -4,7 +4,6 @@ Enhanced tests for precommit tool using mock storage to test real logic
 
 import os
 import tempfile
-from typing import Optional
 from unittest.mock import patch
 
 import pytest
@@ -19,10 +18,10 @@ class MockRedisClient:
         self.data: dict[str, str] = {}
         self.ttl_data: dict[str, int] = {}
 
-    def get(self, key: str) -> Optional[str]:
+    def get(self, key: str) -> str | None:
         return self.data.get(key)
 
-    def set(self, key: str, value: str, ex: Optional[int] = None) -> bool:
+    def set(self, key: str, value: str, ex: int | None = None) -> bool:
         self.data[key] = value
         if ex:
             self.ttl_data[key] = ex

@@ -2,7 +2,7 @@
 Analyze tool - General-purpose code and file analysis
 """
 
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any
 
 from pydantic import Field
 
@@ -28,8 +28,8 @@ class AnalyzeRequest(ToolRequest):
 
     files: list[str] = Field(..., description=ANALYZE_FIELD_DESCRIPTIONS["files"])
     prompt: str = Field(..., description=ANALYZE_FIELD_DESCRIPTIONS["prompt"])
-    analysis_type: Optional[str] = Field(None, description=ANALYZE_FIELD_DESCRIPTIONS["analysis_type"])
-    output_format: Optional[str] = Field("detailed", description=ANALYZE_FIELD_DESCRIPTIONS["output_format"])
+    analysis_type: str | None = Field(None, description=ANALYZE_FIELD_DESCRIPTIONS["analysis_type"])
+    output_format: str | None = Field("detailed", description=ANALYZE_FIELD_DESCRIPTIONS["output_format"])
 
 
 class AnalyzeTool(BaseTool):
@@ -200,6 +200,6 @@ Please analyze these files to answer the user's question."""
 
         return full_prompt
 
-    def format_response(self, response: str, request: AnalyzeRequest, model_info: Optional[dict] = None) -> str:
+    def format_response(self, response: str, request: AnalyzeRequest, model_info: dict | None = None) -> str:
         """Format the analysis response"""
         return f"{response}\n\n---\n\n**Next Steps:** Use this analysis to actively continue your task. Investigate deeper into any findings, implement solutions based on these insights, and carry out the necessary work. Only pause to ask the user if you need their explicit approval for major changes or if critical decisions require their input."

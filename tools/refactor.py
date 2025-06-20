@@ -17,7 +17,7 @@ Key Features:
 
 import logging
 import os
-from typing import Any, Literal, Optional
+from typing import Any, Literal
 
 from pydantic import Field
 
@@ -57,8 +57,8 @@ class RefactorRequest(ToolRequest):
     refactor_type: Literal["codesmells", "decompose", "modernize", "organization"] = Field(
         ..., description=REFACTOR_FIELD_DESCRIPTIONS["refactor_type"]
     )
-    focus_areas: Optional[list[str]] = Field(None, description=REFACTOR_FIELD_DESCRIPTIONS["focus_areas"])
-    style_guide_examples: Optional[list[str]] = Field(
+    focus_areas: list[str] | None = Field(None, description=REFACTOR_FIELD_DESCRIPTIONS["focus_areas"])
+    style_guide_examples: list[str] | None = Field(
         None, description=REFACTOR_FIELD_DESCRIPTIONS["style_guide_examples"]
     )
 
@@ -259,7 +259,7 @@ class RefactorTool(BaseTool):
         return "\n".join(guidance_parts) if guidance_parts else ""
 
     def _process_style_guide_examples(
-        self, style_examples: list[str], continuation_id: Optional[str], available_tokens: int = None
+        self, style_examples: list[str], continuation_id: str | None, available_tokens: int = None
     ) -> tuple[str, str]:
         """
         Process style guide example files using available token budget.
@@ -546,7 +546,7 @@ class RefactorTool(BaseTool):
 
         return full_prompt
 
-    def format_response(self, response: str, request: RefactorRequest, model_info: Optional[dict] = None) -> str:
+    def format_response(self, response: str, request: RefactorRequest, model_info: dict | None = None) -> str:
         """
         Format the refactoring response with immediate implementation directives.
 

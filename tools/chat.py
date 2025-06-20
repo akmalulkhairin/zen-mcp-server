@@ -2,7 +2,7 @@
 Chat tool - General development chat and collaborative thinking
 """
 
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any
 
 from pydantic import Field
 
@@ -35,8 +35,8 @@ class ChatRequest(ToolRequest):
     """Request model for chat tool"""
 
     prompt: str = Field(..., description=CHAT_FIELD_DESCRIPTIONS["prompt"])
-    files: Optional[list[str]] = Field(default_factory=list, description=CHAT_FIELD_DESCRIPTIONS["files"])
-    images: Optional[list[str]] = Field(default_factory=list, description=CHAT_FIELD_DESCRIPTIONS["images"])
+    files: list[str] | None = Field(default_factory=list, description=CHAT_FIELD_DESCRIPTIONS["files"])
+    images: list[str] | None = Field(default_factory=list, description=CHAT_FIELD_DESCRIPTIONS["images"])
 
 
 class ChatTool(BaseTool):
@@ -185,7 +185,7 @@ Please provide a thoughtful, comprehensive response:"""
 
         return full_prompt
 
-    def format_response(self, response: str, request: ChatRequest, model_info: Optional[dict] = None) -> str:
+    def format_response(self, response: str, request: ChatRequest, model_info: dict | None = None) -> str:
         """Format the chat response"""
         return (
             f"{response}\n\n---\n\n**Claude's Turn:** Evaluate this perspective alongside your analysis to "

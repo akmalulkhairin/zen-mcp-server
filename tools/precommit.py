@@ -9,7 +9,7 @@ This provides comprehensive context for AI analysis - not a duplication bug.
 """
 
 import os
-from typing import TYPE_CHECKING, Any, Literal, Optional
+from typing import TYPE_CHECKING, Any, Literal
 
 from pydantic import Field
 
@@ -61,11 +61,11 @@ class PrecommitRequest(ToolRequest):
     """Request model for precommit tool"""
 
     path: str = Field(..., description=PRECOMMIT_FIELD_DESCRIPTIONS["path"])
-    prompt: Optional[str] = Field(None, description=PRECOMMIT_FIELD_DESCRIPTIONS["prompt"])
-    compare_to: Optional[str] = Field(None, description=PRECOMMIT_FIELD_DESCRIPTIONS["compare_to"])
+    prompt: str | None = Field(None, description=PRECOMMIT_FIELD_DESCRIPTIONS["prompt"])
+    compare_to: str | None = Field(None, description=PRECOMMIT_FIELD_DESCRIPTIONS["compare_to"])
     include_staged: bool = Field(True, description=PRECOMMIT_FIELD_DESCRIPTIONS["include_staged"])
     include_unstaged: bool = Field(True, description=PRECOMMIT_FIELD_DESCRIPTIONS["include_unstaged"])
-    focus_on: Optional[str] = Field(None, description=PRECOMMIT_FIELD_DESCRIPTIONS["focus_on"])
+    focus_on: str | None = Field(None, description=PRECOMMIT_FIELD_DESCRIPTIONS["focus_on"])
     review_type: Literal["full", "security", "performance", "quick"] = Field(
         "full", description=PRECOMMIT_FIELD_DESCRIPTIONS["review_type"]
     )
@@ -73,17 +73,17 @@ class PrecommitRequest(ToolRequest):
         "all", description=PRECOMMIT_FIELD_DESCRIPTIONS["severity_filter"]
     )
     max_depth: int = Field(5, description=PRECOMMIT_FIELD_DESCRIPTIONS["max_depth"])
-    temperature: Optional[float] = Field(
+    temperature: float | None = Field(
         None,
         description=PRECOMMIT_FIELD_DESCRIPTIONS["temperature"],
         ge=0.0,
         le=1.0,
     )
-    thinking_mode: Optional[Literal["minimal", "low", "medium", "high", "max"]] = Field(
+    thinking_mode: Literal["minimal", "low", "medium", "high", "max"] | None = Field(
         None, description=PRECOMMIT_FIELD_DESCRIPTIONS["thinking_mode"]
     )
-    files: Optional[list[str]] = Field(None, description=PRECOMMIT_FIELD_DESCRIPTIONS["files"])
-    images: Optional[list[str]] = Field(None, description=PRECOMMIT_FIELD_DESCRIPTIONS["images"])
+    files: list[str] | None = Field(None, description=PRECOMMIT_FIELD_DESCRIPTIONS["files"])
+    images: list[str] | None = Field(None, description=PRECOMMIT_FIELD_DESCRIPTIONS["images"])
 
 
 class Precommit(BaseTool):
@@ -539,7 +539,7 @@ class Precommit(BaseTool):
 
         return full_prompt
 
-    def format_response(self, response: str, request: PrecommitRequest, model_info: Optional[dict] = None) -> str:
+    def format_response(self, response: str, request: PrecommitRequest, model_info: dict | None = None) -> str:
         """Format the response with commit guidance"""
         # Base response
         formatted_response = response

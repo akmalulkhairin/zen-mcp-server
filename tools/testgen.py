@@ -15,7 +15,7 @@ Key Features:
 
 import logging
 import os
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import Field
 
@@ -51,7 +51,7 @@ class TestGenerationRequest(ToolRequest):
 
     files: list[str] = Field(..., description=TESTGEN_FIELD_DESCRIPTIONS["files"])
     prompt: str = Field(..., description=TESTGEN_FIELD_DESCRIPTIONS["prompt"])
-    test_examples: Optional[list[str]] = Field(None, description=TESTGEN_FIELD_DESCRIPTIONS["test_examples"])
+    test_examples: list[str] | None = Field(None, description=TESTGEN_FIELD_DESCRIPTIONS["test_examples"])
 
 
 class TestGenerationTool(BaseTool):
@@ -137,7 +137,7 @@ class TestGenerationTool(BaseTool):
         return TestGenerationRequest
 
     def _process_test_examples(
-        self, test_examples: list[str], continuation_id: Optional[str], available_tokens: int = None
+        self, test_examples: list[str], continuation_id: str | None, available_tokens: int = None
     ) -> tuple[str, str]:
         """
         Process test example files using available token budget for optimal sampling.
@@ -409,7 +409,7 @@ class TestGenerationTool(BaseTool):
 
         return full_prompt
 
-    def format_response(self, response: str, request: TestGenerationRequest, model_info: Optional[dict] = None) -> str:
+    def format_response(self, response: str, request: TestGenerationRequest, model_info: dict | None = None) -> str:
         """
         Format the test generation response.
 
