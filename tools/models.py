@@ -269,9 +269,7 @@ class TraceComplete(BaseModel):
     call_path: list[CallPathStep] | None = Field(default_factory=list, description="Call path for precision trace")
     branching_points: list[BranchingPoint] | None = Field(default_factory=list, description="Branching points")
     side_effects: list[SideEffect] | None = Field(default_factory=list, description="Side effects detected")
-    unresolved: list[UnresolvedDependency] | None = Field(
-        default_factory=list, description="Unresolved dependencies"
-    )
+    unresolved: list[UnresolvedDependency] | None = Field(default_factory=list, description="Unresolved dependencies")
 
     # Dependencies mode fields
     target: TraceTarget | None = Field(None, description="Target for dependency analysis")

@@ -255,9 +255,7 @@ class LogUtils:
         return has_embedding and (has_filtering or has_skip) and has_tool_processing
 
     @classmethod
-    def search_logs_for_pattern(
-        cls, pattern: str, logs: str | None = None, case_sensitive: bool = False
-    ) -> list[str]:
+    def search_logs_for_pattern(cls, pattern: str, logs: str | None = None, case_sensitive: bool = False) -> list[str]:
         """
         Search logs for a specific pattern.
 

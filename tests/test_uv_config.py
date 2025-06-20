@@ -177,6 +177,74 @@ class TestUVConfig(unittest.TestCase):
         finally:
             os.unlink(config_path)
 
+    def test_apply_config_error_handling(self):
+        """Test error handling in apply_config function."""
+        # Test with invalid key types
+        config = {
+            "api_keys": {
+                123: "invalid-key-name",  # Invalid non-string key
+                "valid_key": "valid-value"
+            },
+            "settings": {
+                456: "invalid-setting-name",  # Invalid non-string key
+                "valid_setting": "valid-value"
+            }
+        }
+
+        # Clear any existing env vars
+        for env_var in ["VALID_KEY_API_KEY", "VALID_SETTING"]:
+            if env_var in os.environ:
+                del os.environ[env_var]
+
+        apply_config(config)
+
+        # Valid values should be set
+        self.assertEqual(os.environ.get("VALID_KEY_API_KEY"), "valid-value")
+        self.assertEqual(os.environ.get("VALID_SETTING"), "valid-value")
+
+        # Invalid keys should be skipped (no error raised)
+        self.assertNotIn("123_API_KEY", os.environ)
+        self.assertNotIn("456", os.environ)
+
+    def test_apply_config_precedence_documentation(self):
+        """Test that configuration precedence works as documented."""
+        # Set an existing environment variable
+        os.environ["TEST_PRECEDENCE_API_KEY"] = "env-value"
+        os.environ["TEST_PRECEDENCE_SETTING"] = "env-setting"
+
+        config = {
+            "api_keys": {
+                "test_precedence": "config-value"
+            },
+            "settings": {
+                "test_precedence_setting": "config-setting"
+            }
+        }
+
+        apply_config(config)
+
+        # Environment variables should take precedence (not be overridden)
+        self.assertEqual(os.environ.get("TEST_PRECEDENCE_API_KEY"), "env-value")
+        self.assertEqual(os.environ.get("TEST_PRECEDENCE_SETTING"), "env-setting")
+
+    def test_load_config_file_specific_errors(self):
+        """Test specific error handling in load_config_file function."""
+        # Test FileNotFoundError
+        nonexistent_path = "/nonexistent/path/config.json"
+        result = load_config_file(nonexistent_path)
+        self.assertEqual(result, {})
+
+        # Test json.JSONDecodeError with malformed JSON
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
+            f.write("{ invalid json content")
+            malformed_path = f.name
+
+        try:
+            result = load_config_file(malformed_path)
+            self.assertEqual(result, {})
+        finally:
+            os.unlink(malformed_path)
+
 
 if __name__ == "__main__":
     unittest.main()

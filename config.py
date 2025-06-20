@@ -5,12 +5,16 @@ This module centralizes all configuration settings for the Zen MCP Server.
 It defines model configurations, token limits, temperature defaults, and other
 constants used throughout the application.
 
-Configuration values can be overridden by environment variables where appropriate.
+Configuration Precedence Order (highest to lowest priority):
+1. Environment variables (highest priority)
+2. JSON configuration files (loaded via --config flag)
+3. Default values in this module (lowest priority)
 
 UV/UVX JSON Configuration Support:
 When using UV/UVX with --config flag, JSON configuration files are loaded and
-applied to environment variables before this module is initialized. Supported
-JSON configuration format:
+applied to environment variables before this module is initialized. Environment
+variables that are already set will NOT be overridden by config file values.
+Supported JSON configuration format:
 
 {
   "api_keys": {

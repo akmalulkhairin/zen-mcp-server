@@ -164,7 +164,14 @@ def parse_args():
 
 
 def load_config_file(config_path: str) -> dict:
-    """Load configuration from JSON file."""
+    """Load configuration from JSON file.
+    
+    Args:
+        config_path: Path to the JSON configuration file
+        
+    Returns:
+        dict: Configuration dictionary, empty dict on any error
+    """
     import json
 
     try:
@@ -172,31 +179,82 @@ def load_config_file(config_path: str) -> dict:
             config = json.load(f)
         logger.info(f"Loaded configuration from {config_path}")
         return config
+    except FileNotFoundError:
+        logger.error(f"Config file not found: {config_path}")
+        return {}
+    except json.JSONDecodeError as e:
+        logger.error(f"Failed to parse config file {config_path}: {e}")
+        return {}
+    except PermissionError:
+        logger.error(f"Permission denied reading config file: {config_path}")
+        return {}
     except Exception as e:
-        logger.error(f"Failed to load config file {config_path}: {e}")
+        # Catch any other unexpected errors
+        logger.error(f"An unexpected error occurred loading config file {config_path}: {e}")
         return {}
 
 
 def apply_config(config: dict):
-    """Apply configuration settings to environment variables."""
+    """Apply configuration settings to environment variables.
+    
+    Configuration precedence (highest to lowest):
+    1. Existing environment variables (never overridden)
+    2. JSON configuration file values
+    3. Default values from config.py
+    
+    Args:
+        config: Dictionary containing 'api_keys' and 'settings' sections
+    """
     if not config:
         return
 
     # Apply API keys
     api_keys = config.get("api_keys", {})
     for key, value in api_keys.items():
+        if not isinstance(key, str):
+            logger.warning(f"Skipping invalid API key name: {key} (must be string)")
+            continue
+            
         env_var = f"{key.upper()}_API_KEY"
-        if value and not os.getenv(env_var):
-            os.environ[env_var] = value
-            logger.info(f"Set {env_var} from config file")
+        
+        # Skip None/empty values
+        if not value:
+            logger.debug(f"Skipping empty value for {env_var}")
+            continue
+            
+        # Only set if environment variable doesn't already exist (precedence rule)
+        if not os.getenv(env_var):
+            try:
+                os.environ[env_var] = str(value)
+                logger.info(f"Set {env_var} from config file")
+            except Exception as e:
+                logger.error(f"Failed to set {env_var}: {e}")
+        else:
+            logger.debug(f"Environment variable {env_var} already set, skipping config file value")
 
     # Apply settings
     settings = config.get("settings", {})
     for key, value in settings.items():
+        if not isinstance(key, str):
+            logger.warning(f"Skipping invalid setting name: {key} (must be string)")
+            continue
+            
         env_var = key.upper()
-        if value is not None and not os.getenv(env_var):
-            os.environ[env_var] = str(value)
-            logger.info(f"Set {env_var} from config file")
+        
+        # Skip None values but allow empty strings and zero values
+        if value is None:
+            logger.debug(f"Skipping None value for {env_var}")
+            continue
+            
+        # Only set if environment variable doesn't already exist (precedence rule)
+        if not os.getenv(env_var):
+            try:
+                os.environ[env_var] = str(value)
+                logger.info(f"Set {env_var} from config file")
+            except Exception as e:
+                logger.error(f"Failed to set {env_var}: {e}")
+        else:
+            logger.debug(f"Environment variable {env_var} already set, skipping config file value")
 
 
 # Create the MCP server instance with a unique name identifier

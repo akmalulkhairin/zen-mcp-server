@@ -315,9 +315,7 @@ class Calculator:
         """Validate that logs show file deduplication behavior."""
         return LogUtils.validate_file_deduplication_in_logs(logs, tool_name, test_file)
 
-    def search_logs_for_pattern(
-        self, pattern: str, logs: str | None = None, case_sensitive: bool = False
-    ) -> list[str]:
+    def search_logs_for_pattern(self, pattern: str, logs: str | None = None, case_sensitive: bool = False) -> list[str]:
         """Search logs for a specific pattern."""
         return LogUtils.search_logs_for_pattern(pattern, logs, case_sensitive)
 

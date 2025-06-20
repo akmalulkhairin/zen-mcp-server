@@ -98,9 +98,7 @@ PLANNER_FIELD_DESCRIPTIONS = {
 class PlanStep:
     """Represents a single step in the planning process."""
 
-    def __init__(
-        self, step_number: int, content: str, branch_id: str | None = None, parent_step: int | None = None
-    ):
+    def __init__(self, step_number: int, content: str, branch_id: str | None = None, parent_step: int | None = None):
         self.step_number = step_number
         self.content = content
         self.branch_id = branch_id or "main"
